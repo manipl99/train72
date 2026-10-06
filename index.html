@@ -35,12 +35,12 @@
 </style>
 
 <style>
-
-
-
-
-
-
+.realPhoto{height:100%;width:100%;position:relative;background:#161b21;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.realPhoto img{width:100%;height:100%;object-fit:contain;display:block}
+.realPhoto.heroPhoto img{object-fit:contain}
+.photoLabels{position:absolute;left:12px;right:12px;bottom:10px;display:flex;justify-content:space-between;pointer-events:none}
+.photoLabels span{background:rgba(10,14,18,.82);backdrop-filter:blur(4px);color:#fff;padding:6px 9px;border-radius:8px;font-size:10px;font-weight:800;letter-spacing:.03em}
+.mediaNote{font-size:11px;color:var(--muted);margin-top:7px}
 </style>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -49,7 +49,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Train 72">
 <link rel="apple-touch-icon" href="icon-180.png">
-</head><body><div class='app'><div class='top'><div class='brand'>TRAIN 72</div><div class='badge'>V7.6 · 12 WOCHEN</div></div>
+<style>
+/* V7.7 recovery */
+.sessionEx .exerciseVisual{display:none!important}
+</style></head><body><div class='app'><div class='top'><div class='brand'>TRAIN 72</div><div class='badge'>V7.7 · 12 WOCHEN</div></div>
 <section id='today' class='page active'><h1>Dein Training.</h1><p id='weekSubtitle'>Kraft aufbauen. Laufbasis halten. Konstant bleiben.</p><div class='hero'><b>12-Wochen-Ziel</b><div class='progress'><div id='mainProgress' style='width:0%'></div></div><div class='stats'><div class='stat'><b id='doneCount'>0</b><span>Trainings</span></div><div class='stat'><b id='currentWeight'>70.0</b><span>kg aktuell</span></div><div class='stat'><b>72</b><span>kg Ziel</span></div></div></div><h2>Woche auswählen</h2><div class='weeknav' id='weeknav'></div><div id='workouts'></div></section>
 <section id='progressPage' class='page'><h1>Fortschritt.</h1><p>Training und Körpergewicht auf einen Blick.</p><div class='goalgrid'><div class='goal'><span class='meta'>Trainingsquote</span><b id='completionPct'>0%</b></div><div class='goal'><span class='meta'>Gewichtsziel</span><b id='weightDelta'>+2.0 kg</b></div></div><h2>Gewicht</h2><div class='chart'><div class='weightRow'><input id='weightInput' type='number' inputmode='decimal' step='.1' placeholder='z.B. 70.4'><button class='primary' onclick='addWeight()'>Eintragen</button></div><svg id='weightChart' viewBox='0 0 320 150' preserveAspectRatio='none'></svg><div class='meta' id='weightHistory'></div></div><h2>Wochen</h2><div id='weekTracking'></div><h2>Kraftentwicklung</h2><div id='strengthProgress'></div><h2>Trainingshistorie</h2><div id='history'></div><h2>Übungsbibliothek</h2><div class='libraryGrid' id='library'></div></section>
 <section id='planPage' class='page'><h1>12 Wochen.</h1><p>Bis Jahresende liegt der Fokus auf Muskelaufbau, Kraft und allgemeiner Fitness. Die Laufbasis bleibt erhalten.</p><div class='timeline'><div class='phase'><b>Wochen 1–4 · Basis</b><p>Technik festigen, Gewichte sauber dokumentieren und schrittweise steigern.</p></div><div class='phase'><b>Wochen 5–7 · Aufbau</b><p>Progressive Belastung und erste kurze Tempoabschnitte beim Laufen.</p></div><div class='phase'><b>Woche 8 · Deload</b><p>Volumen reduzieren, 10–15 % leichter trainieren und bewusst regenerieren.</p></div><div class='phase'><b>Wochen 9–11 · Stärkster Block</b><p>Neuer Aufbau mit höheren Arbeitsgewichten. Ziel: klare Fortschritte bei den Grundübungen.</p></div><div class='phase'><b>Woche 12 · Abschluss</b><p>Saubere Abschlusswoche und Vergleich mit Woche 1: Kraftwerte, Gewicht und Trainingskonstanz.</p></div></div></section></div>
@@ -180,17 +183,17 @@ function exerciseThumb(k){
  return `<svg viewBox="0 0 180 120"><rect width="180" height="120" rx="12" fill="#20262d"/><g transform="translate(25,-7) scale(.68)">${poseFigure(k,'end')}</g></svg>`;
 }
 
-(k){
- const u=false;
+const photoAssets={}; function realisticVisual(k){return ''}(k){
+ const u=photoAssets[k];
  if(!u)return individualMotion(k);
  if(k==='RDL') return `<div class="realPhoto heroPhoto"><img src="${u}" alt="${exercises[k].name} – realistische Start- und Endposition"><div class="photoLabels"><span>STARTPOSITION</span><span>ENDPOSITION</span></div></div>`;
  return `<div class="realPhoto"><img src="${u}" alt="${exercises[k].name} – realistische Übungsdarstellung"></div>`;
 }
 
-function motionSVG(k){return individualMotion(k)}
+function motionSVG(k){return realisticVisual(k)}
 function guideHTML(k){
  let g=guides[k]||{steps:[exercises[k].cue],good:[],bad:[],muscles:[]};
- return `<div class="guideHero"><div class="stage">${motionSVG(k)}</div></div>
+ return `<div class="guideHero"><div class="stage">${motionSVG(k)}</div></div>${photoAssets[k]?`<div class="mediaNote">Realistische Übungsdarstellung</div>`:`<div class="mediaNote">Illustration – realistisches Asset folgt</div>`}
  <div class="guideSection"><h3>So geht's</h3><div class="steps">${g.steps.map((s,i)=>`<div class="step"><i>${i+1}</i><div>${s}</div></div>`).join('')}</div></div>
  <div class="guideSection"><h3>Darauf achten</h3><div class="cues">${g.good.map(s=>`<div class="cue good">${s}</div>`).join('')}${g.bad.map(s=>`<div class="cue bad">${s}</div>`).join('')}</div></div>
  <div class="guideSection"><h3>Beanspruchte Muskulatur</h3><div class="muscleWrap"><div class="muscleMap">${muscleSVG(k)}</div><div class="muscleList">${g.muscles.map(([n,c])=>`<div class="muscleItem"><span class="dot ${c}"></span>${n}</div>`).join('')}</div></div></div>`;
@@ -252,20 +255,11 @@ state.sessions.forEach(s=>(s.exercises||[]).forEach(e=>{
 
 function save(){localStorage.setItem('train72',JSON.stringify(state));renderAll()}
 function renderWeeks(){weeknav.innerHTML='';for(let i=1;i<=12;i++){let b=document.createElement('button');b.className='weekbtn '+(state.week===i?'active':'');b.textContent=i;b.onclick=()=>{state.week=i;save()};weeknav.appendChild(b)}}
-function exRows(arr){return arr.map(([k,r])=>`<div class='exercise'><div><b>${exercises[k].name}</b><small>${r}</small></div><button class='info' type='button' aria-label='Info zu ${exercises[k].name}' onclick="openModal('${k}')">ⓘ</button></div>`).join('')}
+function exRows(arr){return arr.map(([k,r])=>`<div class='exercise'><div class='exerciseArt'>${exerciseThumb(k)}</div><div><b>${exercises[k].name}</b><small>${r}</small></div><button class='info' aria-label='Übungsinfo' onclick="openModal('${k}')">ⓘ</button></div>`).join('')}
 function card(key,title,meta,arr){let id=`${state.week}-${key}`,done=state.done[id];return `<div class='workout ${done?'done':''}'><div class='workoutHead'><div><h3>${title}</h3><div class='meta'>${meta}</div></div><b>${done?'✓':''}</b></div>${exRows(arr)}<button class='primary startBtn' onclick="startSession('${key}')">${done?'Nochmals trainieren':'Training starten'}</button></div>`}
 function renderWorkouts(){let w=weeks[state.week-1],deload=state.week===8;workouts.innerHTML=`<div class='meta' style='margin:12px 2px'>WOCHE ${state.week} · ${w[1]}</div>`+card('A','A · Ganzkörper Kraft',deload?'ca. 40 min · 2 Sätze / 10–15 % leichter':'50–60 min · RPE 7–8',A)+card('B','B · Lauf + Athletik',w[0]+' · ca. 45–55 min',B)+card('C','C · Muskelaufbau',deload?'ca. 40 min · 2 Sätze / 10–15 % leichter':'50–60 min · Sätze je Übung durchziehen',C)}
 function toggleDone(id){state.done[id]=!state.done[id];save()}
-function openModal(k){
- modalTitle.textContent=exercises[k].name;
- modalIcon.style.display='block';
- modalIcon.innerHTML=motionSVG(k);
- modalCue.innerHTML='';
- modalText.textContent=exercises[k].text;
- modal.classList.add('show');
- document.body.classList.add('modalOpen');
-}
-function closeModal(){modal.classList.remove('show');document.body.classList.remove('modalOpen')}
+function openModal(k){modalTitle.textContent=exercises[k].name;modalIcon.style.display='block';modalIcon.innerHTML=exerciseSVG(k,true);modalCue.innerHTML=guideHTML(k);modalText.textContent=exercises[k].text;modal.classList.add('show');document.body.classList.add('modalOpen')}function closeModal(){modal.classList.remove('show');document.body.classList.remove('modalOpen')}function closeModal(){modal.classList.remove('show')}
 function addWeight(){let v=parseFloat(weightInput.value.replace(',','.'));if(!v||v<40||v>150)return;state.weights.push({date:new Date().toLocaleDateString('de-AT',{day:'2-digit',month:'2-digit'}),value:v});weightInput.value='';save()}
 function renderChart(){let a=state.weights.slice(-12),vals=a.map(x=>x.value),min=Math.min(...vals,69.5),max=Math.max(...vals,72.2),range=max-min||1;let pts=a.map((x,i)=>`${15+(i/(Math.max(1,a.length-1)))*290},${130-((x.value-min)/range)*105}`).join(' ');weightChart.innerHTML=`<line x1='15' y1='130' x2='305' y2='130' stroke='#353b46'/><line x1='15' y1='25' x2='305' y2='25' stroke='#353b46' stroke-dasharray='4'/><polyline points='${pts}' fill='none' stroke='#c9ff43' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/>`+a.map((x,i)=>`<circle cx='${15+(i/(Math.max(1,a.length-1)))*290}' cy='${130-((x.value-min)/range)*105}' r='4' fill='#c9ff43'/>`).join('');weightHistory.textContent=a.map(x=>`${x.date}: ${x.value.toFixed(1)} kg`).join(' · ')}
 function renderTracking(){let total=36,done=Object.values(state.done).filter(Boolean).length,pct=Math.round(done/total*100),cw=state.weights[state.weights.length-1].value;doneCount.textContent=done;mainProgress.style.width=pct+'%';completionPct.textContent=pct+'%';currentWeight.textContent=cw.toFixed(1);weightDelta.textContent=(72-cw>=0?'+':'')+(72-cw).toFixed(1)+' kg';weekTracking.innerHTML=weeks.map((w,i)=>{let n=[`A`,`B`,`C`].filter(k=>state.done[`${i+1}-${k}`]).length;return `<div class='workout'><div class='workoutHead'><div><h3>Woche ${i+1}</h3><div class='meta'>${w[1]}</div></div><b>${n}/3</b></div></div>`}).join('');renderChart()}
@@ -287,6 +281,7 @@ function renderSession(){
   let lastLoad=last&&last.load?last.load:0;
   let weighted=isWeighted(e.key);
   return `<div class='sessionEx'>
+   
    <h2 style='margin:0 0 4px'>${x.name}</h2>
    <div class='meta'>${e.target}</div>
    <div class='last'>${weighted?(lastLoad?`Letztes Arbeitsgewicht: <b>${lastLoad} kg</b>`:'Noch kein Gewicht gespeichert'):'Körpergewichtsübung · kein Gewichtseintrag nötig'}<br><span class='suggest'>${weighted?suggestion(e.key,e.target):'Führe die vorgegebenen Sätze/Wiederholungen sauber aus.'}</span></div>
@@ -320,17 +315,40 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 </script>
-</body></html><style>
-.exercise{grid-template-columns:1fr 48px!important;align-items:center}
-.exerciseArt{display:none!important}
-.exercise .info{display:grid!important;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:#252c35!important;color:#c9ff43!important;font-size:21px!important}
-.sessionEx .exerciseVisual{display:none!important}
-.modal{z-index:100!important;overflow-y:auto!important}
-.modal .sheet{max-height:92dvh!important;overflow-y:auto!important}
-.modal .demo{display:block!important;height:auto!important;min-height:240px!important;background:#151a22!important;padding:12px!important}
+</body></html>
+
+<style>
+.modal .demo{height:auto;min-height:260px;overflow:visible;padding:10px}
+.modal .realPhoto{height:auto;min-height:240px;overflow:hidden}
+.modal .realPhoto img{height:auto;max-height:58dvh;object-fit:contain}
+.sessionTop .secondary{position:relative;z-index:5;min-width:44px;min-height:44px;touch-action:manipulation}
+.modal .close{position:sticky;top:0;z-index:5;min-width:44px;min-height:44px;touch-action:manipulation}
+</style>
+
+<style>
+/* V7.2 – direct start/end exercise visuals */
+.sessionEx .exerciseVisual{
+  width:100%;height:auto;min-height:220px;margin:0 0 16px;
+  background:#f4f4f2;border-radius:18px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.sessionEx .exerciseVisual svg{width:100%;height:auto;min-height:220px}
+.sessionEx .realPhoto{width:100%;height:auto;min-height:220px;background:#f4f4f2}
+.sessionEx .realPhoto img{width:100%;height:auto;max-height:none;object-fit:contain}
+.sessionEx .photoLabels{display:none}
+.exercise .info{display:block!important}
+.exercise{grid-template-columns:78px 1fr 42px!important}
+.exerciseArt{width:78px;height:62px;background:#f4f4f2;border-radius:10px;overflow:hidden}
+.exerciseArt svg,.exerciseArt img{width:100%;height:100%;object-fit:contain}
+</style>
+<style>
+/* V7.3 schematic exercise info */
+.modal{z-index:100!important}
+.modal .demo{height:auto!important;min-height:260px!important;background:#151a22!important;padding:12px!important}
 .modal #modalIcon{display:block!important;width:100%!important;font-size:0!important}
-.modal #modalIcon svg{display:block!important;width:100%!important;height:auto!important;min-height:220px!important;max-height:330px!important}
-#modalCue{display:none!important}
-#modalText{font-size:14px!important;line-height:1.55!important;color:#dfe4ea!important;margin:14px 2px!important}
-body.modalOpen{overflow:hidden!important}
+.modal #modalIcon svg{display:block;width:100%!important;height:auto!important;min-height:230px!important;max-height:340px!important}
+.modal .realPhoto{display:none!important}
+.exercise .info{display:block!important;border:0;background:transparent;color:var(--accent);font-size:20px;min-width:42px;min-height:42px}
+.exercise{grid-template-columns:78px 1fr 42px!important}
+body.modalOpen{overflow:hidden}
 </style>
