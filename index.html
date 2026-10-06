@@ -254,7 +254,7 @@ state.sessions.forEach(s=>(s.exercises||[]).forEach(e=>{
 
 function save(){localStorage.setItem('train72',JSON.stringify(state));renderAll()}
 function renderWeeks(){weeknav.innerHTML='';for(let i=1;i<=12;i++){let b=document.createElement('button');b.className='weekbtn '+(state.week===i?'active':'');b.textContent=i;b.onclick=()=>{state.week=i;save()};weeknav.appendChild(b)}}
-function exRows(arr){return arr.map(([k,r])=>`<div class='exercise'><div class='exerciseArt'>${exerciseThumb(k)}</div><div><b>${exercises[k].name}</b><small>${r}</small></div><button class='info' onclick="openModal('${k}')">ⓘ</button></div>`).join('')}
+function exRows(arr){return arr.map(([k,r])=>`<div class='exercise'><div class='exerciseArt'>${exerciseThumb(k)}</div><div><b>${exercises[k].name}</b><small>${r}</small></div></div>`).join('')}
 function card(key,title,meta,arr){let id=`${state.week}-${key}`,done=state.done[id];return `<div class='workout ${done?'done':''}'><div class='workoutHead'><div><h3>${title}</h3><div class='meta'>${meta}</div></div><b>${done?'✓':''}</b></div>${exRows(arr)}<button class='primary startBtn' onclick="startSession('${key}')">${done?'Nochmals trainieren':'Training starten'}</button></div>`}
 function renderWorkouts(){let w=weeks[state.week-1],deload=state.week===8;workouts.innerHTML=`<div class='meta' style='margin:12px 2px'>WOCHE ${state.week} · ${w[1]}</div>`+card('A','A · Ganzkörper Kraft',deload?'ca. 40 min · 2 Sätze / 10–15 % leichter':'50–60 min · RPE 7–8',A)+card('B','B · Lauf + Athletik',w[0]+' · ca. 45–55 min',B)+card('C','C · Muskelaufbau',deload?'ca. 40 min · 2 Sätze / 10–15 % leichter':'50–60 min · Sätze je Übung durchziehen',C)}
 function toggleDone(id){state.done[id]=!state.done[id];save()}
@@ -280,9 +280,9 @@ function renderSession(){
   let lastLoad=last&&last.load?last.load:0;
   let weighted=isWeighted(e.key);
   return `<div class='sessionEx'>
-   <div class='exerciseVisual'>${exerciseSVG(e.key,true)}</div>
+   <div class='exerciseVisual'>${realisticVisual(e.key)||exerciseSVG(e.key,true)}</div>
    <h2 style='margin:0 0 4px'>${x.name}</h2>
-   <div class='meta'>${e.target}</div><button class='smallBtn' style='margin-top:10px' onclick="openModal('${e.key}')">Technik ansehen</button>
+   <div class='meta'>${e.target}</div>
    <div class='last'>${weighted?(lastLoad?`Letztes Arbeitsgewicht: <b>${lastLoad} kg</b>`:'Noch kein Gewicht gespeichert'):'Körpergewichtsübung · kein Gewichtseintrag nötig'}<br><span class='suggest'>${weighted?suggestion(e.key,e.target):'Führe die vorgegebenen Sätze/Wiederholungen sauber aus.'}</span></div>
    ${weighted?`<div class='loadBox'><label>Arbeitsgewicht für diese Übung</label><select class='loadSelect' onchange="setLoad(${ei},this.value)">${loadOptions(lastLoad)}</select></div>`:`<div class='bodyweightTag'>Eigengewicht · automatisch erfasst</div>`}
   </div>`;
@@ -323,3 +323,20 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 .sessionTop .secondary{position:relative;z-index:5;min-width:44px;min-height:44px;touch-action:manipulation}
 .modal .close{position:sticky;top:0;z-index:5;min-width:44px;min-height:44px;touch-action:manipulation}
 </style>
+
+<style>
+/* V7.2 – direct start/end exercise visuals */
+.sessionEx .exerciseVisual{
+  width:100%;height:auto;min-height:220px;margin:0 0 16px;
+  background:#f4f4f2;border-radius:18px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.sessionEx .exerciseVisual svg{width:100%;height:auto;min-height:220px}
+.sessionEx .realPhoto{width:100%;height:auto;min-height:220px;background:#f4f4f2}
+.sessionEx .realPhoto img{width:100%;height:auto;max-height:none;object-fit:contain}
+.sessionEx .photoLabels{display:none}
+.exercise .info{display:none!important}
+.exercise{grid-template-columns:78px 1fr!important}
+.exerciseArt{width:78px;height:62px;background:#f4f4f2;border-radius:10px;overflow:hidden}
+.exerciseArt svg,.exerciseArt img{width:100%;height:100%;object-fit:contain}
+</style><style>#modal{display:none!important}</style>
