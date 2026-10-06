@@ -49,7 +49,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Train 72">
 <link rel="apple-touch-icon" href="icon-180.png">
-</head><body><div class='app'><div class='top'><div class='brand'>TRAIN 72</div><div class='badge'>12 WOCHEN</div></div>
+</head><body><div class='app'><div class='top'><div class='brand'>TRAIN 72</div><div class='badge'>V7.6 · 12 WOCHEN</div></div>
 <section id='today' class='page active'><h1>Dein Training.</h1><p id='weekSubtitle'>Kraft aufbauen. Laufbasis halten. Konstant bleiben.</p><div class='hero'><b>12-Wochen-Ziel</b><div class='progress'><div id='mainProgress' style='width:0%'></div></div><div class='stats'><div class='stat'><b id='doneCount'>0</b><span>Trainings</span></div><div class='stat'><b id='currentWeight'>70.0</b><span>kg aktuell</span></div><div class='stat'><b>72</b><span>kg Ziel</span></div></div></div><h2>Woche auswählen</h2><div class='weeknav' id='weeknav'></div><div id='workouts'></div></section>
 <section id='progressPage' class='page'><h1>Fortschritt.</h1><p>Training und Körpergewicht auf einen Blick.</p><div class='goalgrid'><div class='goal'><span class='meta'>Trainingsquote</span><b id='completionPct'>0%</b></div><div class='goal'><span class='meta'>Gewichtsziel</span><b id='weightDelta'>+2.0 kg</b></div></div><h2>Gewicht</h2><div class='chart'><div class='weightRow'><input id='weightInput' type='number' inputmode='decimal' step='.1' placeholder='z.B. 70.4'><button class='primary' onclick='addWeight()'>Eintragen</button></div><svg id='weightChart' viewBox='0 0 320 150' preserveAspectRatio='none'></svg><div class='meta' id='weightHistory'></div></div><h2>Wochen</h2><div id='weekTracking'></div><h2>Kraftentwicklung</h2><div id='strengthProgress'></div><h2>Trainingshistorie</h2><div id='history'></div><h2>Übungsbibliothek</h2><div class='libraryGrid' id='library'></div></section>
 <section id='planPage' class='page'><h1>12 Wochen.</h1><p>Bis Jahresende liegt der Fokus auf Muskelaufbau, Kraft und allgemeiner Fitness. Die Laufbasis bleibt erhalten.</p><div class='timeline'><div class='phase'><b>Wochen 1–4 · Basis</b><p>Technik festigen, Gewichte sauber dokumentieren und schrittweise steigern.</p></div><div class='phase'><b>Wochen 5–7 · Aufbau</b><p>Progressive Belastung und erste kurze Tempoabschnitte beim Laufen.</p></div><div class='phase'><b>Woche 8 · Deload</b><p>Volumen reduzieren, 10–15 % leichter trainieren und bewusst regenerieren.</p></div><div class='phase'><b>Wochen 9–11 · Stärkster Block</b><p>Neuer Aufbau mit höheren Arbeitsgewichten. Ziel: klare Fortschritte bei den Grundübungen.</p></div><div class='phase'><b>Woche 12 · Abschluss</b><p>Saubere Abschlusswoche und Vergleich mit Woche 1: Kraftwerte, Gewicht und Trainingskonstanz.</p></div></div></section></div>
@@ -187,7 +187,7 @@ function exerciseThumb(k){
  return `<div class="realPhoto"><img src="${u}" alt="${exercises[k].name} – realistische Übungsdarstellung"></div>`;
 }
 
-function motionSVG(k){return exerciseSVG(k,true)}
+function motionSVG(k){return individualMotion(k)}
 function guideHTML(k){
  let g=guides[k]||{steps:[exercises[k].cue],good:[],bad:[],muscles:[]};
  return `<div class="guideHero"><div class="stage">${motionSVG(k)}</div></div>
@@ -259,7 +259,7 @@ function toggleDone(id){state.done[id]=!state.done[id];save()}
 function openModal(k){
  modalTitle.textContent=exercises[k].name;
  modalIcon.style.display='block';
- modalIcon.innerHTML=exerciseSVG(k,true);
+ modalIcon.innerHTML=motionSVG(k);
  modalCue.innerHTML='';
  modalText.textContent=exercises[k].text;
  modal.classList.add('show');
@@ -320,52 +320,17 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 </script>
-</body></html>
-
-<style>
-.modal .demo{height:auto;min-height:260px;overflow:visible;padding:10px}
-.modal 
-.modal 
-.sessionTop .secondary{position:relative;z-index:5;min-width:44px;min-height:44px;touch-action:manipulation}
-.modal .close{position:sticky;top:0;z-index:5;min-width:44px;min-height:44px;touch-action:manipulation}
-</style>
-
-<style>
-/* V7.2 – direct start/end exercise visuals */
-.sessionEx .exerciseVisual{
-  width:100%;height:auto;min-height:220px;margin:0 0 16px;
-  background:#f4f4f2;border-radius:18px;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-.sessionEx .exerciseVisual svg{width:100%;height:auto;min-height:220px}
-.sessionEx 
-.sessionEx 
-.sessionEx 
-.exercise .info{display:block!important}
-.exercise{grid-template-columns:78px 1fr 42px!important}
-.exerciseArt{width:78px;height:62px;background:#f4f4f2;border-radius:10px;overflow:hidden}
-.exerciseArt svg,.exerciseArt img{width:100%;height:100%;object-fit:contain}
-</style>
-<style>
-/* V7.3 schematic exercise info */
-.modal{z-index:100!important}
-.modal .demo{height:auto!important;min-height:260px!important;background:#151a22!important;padding:12px!important}
-.modal #modalIcon{display:block!important;width:100%!important;font-size:0!important}
-.modal #modalIcon svg{display:block;width:100%!important;height:auto!important;min-height:230px!important;max-height:340px!important}
-.modal 
-.exercise .info{display:block!important;border:0;background:transparent;color:var(--accent);font-size:20px;min-width:42px;min-height:42px}
-.exercise{grid-template-columns:78px 1fr 42px!important}
-body.modalOpen{overflow:hidden}
-</style>
-<style>
-/* V7.5: schematic info only */
+</body></html><style>
 .exercise{grid-template-columns:1fr 48px!important;align-items:center}
 .exerciseArt{display:none!important}
-.exercise .info{display:grid!important;place-items:center;width:44px;height:44px;border-radius:50%;background:#252c35!important;color:#c9ff43!important;font-size:21px!important}
+.exercise .info{display:grid!important;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:#252c35!important;color:#c9ff43!important;font-size:21px!important}
 .sessionEx .exerciseVisual{display:none!important}
-#modal .demo{display:block!important;background:#151a22!important;min-height:230px!important}
-#modal #modalIcon{width:100%!important}
-#modal #modalIcon svg{width:100%!important;height:auto!important;min-height:220px!important}
+.modal{z-index:100!important;overflow-y:auto!important}
+.modal .sheet{max-height:92dvh!important;overflow-y:auto!important}
+.modal .demo{display:block!important;height:auto!important;min-height:240px!important;background:#151a22!important;padding:12px!important}
+.modal #modalIcon{display:block!important;width:100%!important;font-size:0!important}
+.modal #modalIcon svg{display:block!important;width:100%!important;height:auto!important;min-height:220px!important;max-height:330px!important}
 #modalCue{display:none!important}
-#modalText{font-size:14px;line-height:1.55;color:#dfe4ea;margin:14px 2px}
+#modalText{font-size:14px!important;line-height:1.55!important;color:#dfe4ea!important;margin:14px 2px!important}
+body.modalOpen{overflow:hidden!important}
 </style>
